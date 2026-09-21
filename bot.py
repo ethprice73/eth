@@ -681,7 +681,7 @@ def create_price_card(price_data):
     ax.text(
         208,
         39,
-        "@import os
+        import os
 import json
 import time
 import io
