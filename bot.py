@@ -24,17 +24,15 @@ if not CHANNEL_ID:
 
 
 # =========================================================
-# COINGECKO ETH PRICE
+# BINANCE ETH PRICE
 # =========================================================
 
 def get_eth_price():
 
-    url = "https://api.coingecko.com/api/v3/simple/price"
+    url = "https://api.binance.com/api/v3/ticker/24hr"
 
     params = {
-        "ids": "ethereum",
-        "vs_currencies": "usd",
-        "include_24hr_change": "true"
+        "symbol": "ETHUSDT"
     }
 
     try:
@@ -42,17 +40,15 @@ def get_eth_price():
         response = requests.get(
             url,
             params=params,
-            timeout=20
+            timeout=15
         )
 
         response.raise_for_status()
 
         data = response.json()
 
-        price = float(data["ethereum"]["usd"])
-        change_24h = float(
-            data["ethereum"]["usd_24h_change"]
-        )
+        price = float(data["lastPrice"])
+        change_24h = float(data["priceChangePercent"])
 
         return {
             "usd": price,
@@ -61,7 +57,7 @@ def get_eth_price():
 
     except Exception as e:
 
-        print("CoinGecko API Error:", e)
+        print("Binance API Error:", e)
 
         return None
 
@@ -80,15 +76,19 @@ def create_price_card(price_data, previous_price=None):
     # -----------------------------------------------------
 
     if previous_price is None:
+
         direction = "up"
 
     elif price > previous_price:
+
         direction = "up"
 
     elif price < previous_price:
+
         direction = "down"
 
     else:
+
         direction = "same"
 
 
@@ -108,12 +108,19 @@ def create_price_card(price_data, previous_price=None):
 
     ax.axis("off")
 
+
     # =====================================================
     # BACKGROUND
     # =====================================================
 
     ax.set_facecolor("#10162D")
+
     fig.patch.set_facecolor("#10162D")
+
+
+    # =====================================================
+    # BACKGROUND GRADIENT STYLE BLOCKS
+    # =====================================================
 
     ax.add_patch(
         FancyBboxPatch(
@@ -125,6 +132,9 @@ def create_price_card(price_data, previous_price=None):
             edgecolor="none"
         )
     )
+
+
+    # Purple decorative area
 
     ax.add_patch(
         FancyBboxPatch(
@@ -138,6 +148,9 @@ def create_price_card(price_data, previous_price=None):
         )
     )
 
+
+    # Blue decorative area
+
     ax.add_patch(
         FancyBboxPatch(
             (-50, 65),
@@ -149,6 +162,7 @@ def create_price_card(price_data, previous_price=None):
             alpha=0.55
         )
     )
+
 
     # =====================================================
     # ETH LOGO
@@ -181,6 +195,7 @@ def create_price_card(price_data, previous_price=None):
     ax.add_patch(top_triangle)
     ax.add_patch(bottom_triangle)
 
+
     # =====================================================
     # ETHEREUM TEXT
     # =====================================================
@@ -198,30 +213,32 @@ def create_price_card(price_data, previous_price=None):
     ax.text(
         42,
         69,
-        "ETH / USD",
+        "ETH / USDT",
         fontsize=5.5,
         color="#9DA8C7",
         va="center"
     )
 
-    # =====================================================
-    # PRICE COLOR
-    # =====================================================
-
-    if direction == "up":
-        price_color = "#20D878"
-
-    elif direction == "down":
-        price_color = "#FF4F67"
-
-    else:
-        price_color = "white"
 
     # =====================================================
     # PRICE
     # =====================================================
 
+    if direction == "up":
+
+        price_color = "#20D878"
+
+    elif direction == "down":
+
+        price_color = "#FF4F67"
+
+    else:
+
+        price_color = "white"
+
+
     price_text = f"${price:,.2f}"
+
 
     ax.text(
         206,
@@ -233,6 +250,7 @@ def create_price_card(price_data, previous_price=None):
         ha="center",
         va="center"
     )
+
 
     # =====================================================
     # UP / DOWN TRIANGLE
@@ -263,6 +281,7 @@ def create_price_card(price_data, previous_price=None):
             ha="center"
         )
 
+
     elif direction == "down":
 
         triangle = Polygon(
@@ -288,6 +307,7 @@ def create_price_card(price_data, previous_price=None):
             ha="center"
         )
 
+
     else:
 
         ax.text(
@@ -299,6 +319,7 @@ def create_price_card(price_data, previous_price=None):
             color="#B5BCD2",
             ha="center"
         )
+
 
     # =====================================================
     # 24H CHANGE
@@ -314,7 +335,9 @@ def create_price_card(price_data, previous_price=None):
         change_color = "#FF4F67"
         change_sign = ""
 
+
     change_text = f"{change_sign}{change_24h:.2f}% 24H"
+
 
     ax.text(
         355,
@@ -326,6 +349,7 @@ def create_price_card(price_data, previous_price=None):
         ha="center",
         va="center"
     )
+
 
     # =====================================================
     # CHANNEL PILL
@@ -343,6 +367,7 @@ def create_price_card(price_data, previous_price=None):
 
     ax.add_patch(pill)
 
+
     ax.text(
         80.5,
         18.5,
@@ -354,20 +379,22 @@ def create_price_card(price_data, previous_price=None):
         va="center"
     )
 
+
     # =====================================================
-    # API LABEL
+    # BINANCE LABEL
     # =====================================================
 
     ax.text(
         350,
         18,
-        "COINGECKO",
+        "BINANCE",
         fontsize=5.5,
         fontweight="bold",
         color="#9DA8C7",
         ha="center",
         va="center"
     )
+
 
     # =====================================================
     # SMALL MOVEMENT INDICATORS
@@ -378,6 +405,7 @@ def create_price_card(price_data, previous_price=None):
         for i in range(5):
 
             x = 155 + (i * 7)
+
             h = 4 + (i * 2)
 
             ax.add_patch(
@@ -392,11 +420,13 @@ def create_price_card(price_data, previous_price=None):
                 )
             )
 
+
     elif direction == "down":
 
         for i in range(5):
 
             x = 155 + (i * 7)
+
             h = 12 - (i * 1.5)
 
             ax.add_patch(
@@ -411,8 +441,9 @@ def create_price_card(price_data, previous_price=None):
                 )
             )
 
+
     # =====================================================
-    # SAVE IMAGE
+    # SAVE IMAGE TO MEMORY
     # =====================================================
 
     image_buffer = io.BytesIO()
@@ -484,7 +515,9 @@ def send_photo(image_buffer, caption):
 def format_caption(price_data, previous_price=None):
 
     price = price_data["usd"]
+
     change_24h = price_data["usd_24h_change"]
+
 
     if previous_price is None:
 
@@ -502,6 +535,7 @@ def format_caption(price_data, previous_price=None):
 
         direction_text = "•"
 
+
     if change_24h >= 0:
 
         change_text = f"+{change_24h:.2f}%"
@@ -510,12 +544,14 @@ def format_caption(price_data, previous_price=None):
 
         change_text = f"{change_24h:.2f}%"
 
+
     caption = (
         f"<b>{direction_text} ETHEREUM</b>\n\n"
         f"<b>${price:,.2f}</b>  "
         f"<b>{change_text}</b> 24H\n\n"
         f"@eth_pricealert"
     )
+
 
     return caption
 
@@ -549,10 +585,7 @@ def test_telegram():
 # SEND CHANNEL UPDATE
 # =========================================================
 
-def send_channel_update(
-    price_data,
-    previous_price=None
-):
+def send_channel_update(price_data, previous_price=None):
 
     image = create_price_card(
         price_data,
@@ -581,7 +614,7 @@ def price_monitor():
     print("ETH Price Monitor Started")
     print("Channel:", CHANNEL_ID)
     print("Interval: 10 minutes")
-    print("Source: CoinGecko")
+    print("Source: Binance ETHUSDT")
 
 
     while True:
@@ -590,32 +623,33 @@ def price_monitor():
 
             price_data = get_eth_price()
 
+
             if price_data:
 
                 current_price = price_data["usd"]
+
 
                 print(
                     f"ETH: ${current_price:,.2f}"
                 )
 
-                success = send_channel_update(
+
+                # -----------------------------------------
+                # SEND UPDATE
+                # -----------------------------------------
+
+                send_channel_update(
                     price_data,
                     previous_price
                 )
 
-                if success:
 
-                    print(
-                        "Telegram price update sent successfully."
-                    )
-
-                else:
-
-                    print(
-                        "Telegram price update failed."
-                    )
+                # -----------------------------------------
+                # SAVE CURRENT PRICE
+                # -----------------------------------------
 
                 previous_price = current_price
+
 
             else:
 
@@ -623,12 +657,18 @@ def price_monitor():
                     "Could not get ETH price."
                 )
 
+
         except Exception as e:
 
             print(
                 "Monitor Error:",
                 e
             )
+
+
+        # ---------------------------------------------
+        # WAIT 10 MINUTES
+        # ---------------------------------------------
 
         print(
             "Next update in 10 minutes..."
@@ -669,12 +709,13 @@ if __name__ == "__main__":
 
     print(
         "API:",
-        "CoinGecko"
+        "Binance"
     )
 
     print(
         "================================"
     )
+
 
     test_telegram()
 
