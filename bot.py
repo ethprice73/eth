@@ -13,7 +13,7 @@ from matplotlib.patches import FancyBboxPatch, Polygon
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHANNEL_ID = os.getenv("TELEGRAM_CHANNEL_ID")
 
-CHECK_INTERVAL = 600  # 10 minutes
+CHECK_INTERVAL = 600  # 1 minutes
 
 
 if not BOT_TOKEN:
